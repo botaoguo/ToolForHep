@@ -1,0 +1,12 @@
+# ROOT files in the main folder
+*.root
+
+# plots / figures
+*.png
+*.pdf
+*.svg
+
+# pythonstuff
+*.pyc
+__pycache__/
+*__init__.py
