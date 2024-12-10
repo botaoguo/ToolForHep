@@ -23,7 +23,7 @@ def truth_filter_bbmm( genparticles ):
 
 # significane s/sqrt(b)
 def sig_sob( s, b ):
-    if b == 0:
+    if b <= 0:
       return 0
     else:
       return s/math.sqrt(b)

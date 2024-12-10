@@ -7,7 +7,7 @@ import util
 # - python optimise.py file.root sig_dsid1,2,3 bkg_dsid1,2,3 cut_string criteria var_name min max n_step direction
 # - python optimise.py myfile.root 002 202,203,204 "1" "m_2mu,115,135,10;m_2bj,93,137,10" pt2mu_ov_m2mu 0.2 0.8 20 right
 
-# - python optimise.py /data/pubfs/botaoguo/CROWN/build_test0315/bin/forOptimisation/zmerged_2l.root vhmm dyjets,diboson,top "trg_single_mu24==1" "dimuon_p4_Higgs.fCoordinates.fM,110,150,8" met_p4.fCoordinates.fPt 50 200 30 right
+# - python optimise.py /data/bond/botaoguo/farm221DNN/0531_version/output_3l.root vhmm dyjets,diboson,top "trg_single_mu24==1&&Flag_dimuon_Zmass_veto==1" "H_mass,110,150,16" dnn_score 0 1 100 right
 # ^ test_var: optimise threshold on this variable
 # * ranges in criteria will be added as cuts to cut_string
 # [algo]:
@@ -206,11 +206,11 @@ outfile = R.TFile.Open(outputfile, 'RECREATE')
 test_cri_hsig.Write()
 test_cri_hbkg.Write()
 outfile.Close()
-#print('scan threshold: {}'.format(list_threshold))
-#print('sob binned: {}'.format(list_sob_binned))
-#print('sob inclusive: {}'.format(list_sob_inclu))
-#print('signal efficiency: {}'.format(list_eff_sig))
-#print('background efficiency: {}'.format(list_eff_bkg))
+print('scan threshold: {}'.format(list_threshold))
+print('sob binned: {}'.format(list_sob_binned))
+print('sob inclusive: {}'.format(list_sob_inclu))
+print('signal efficiency: {}'.format(list_eff_sig))
+print('background efficiency: {}'.format(list_eff_bkg))
 #print('sob efficiency: {}'.format(list_sob_eff))
 
 
