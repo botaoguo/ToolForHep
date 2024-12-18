@@ -5,53 +5,45 @@ import os
 import ROOT as R
 import time
 import array
+import socket
 
 R.gROOT.SetBatch(True)
-R.gInterpreter.Declare('#include "picoNtupler.h"')
+R.gInterpreter.Declare('#include "/data/bond/botaoguo/CROWN/build_run3/bin/applyfactor.h"')
+
 # need CROWN env
-# 2022preEE C, D,     4.953+2.922=7.875
-# 2022preEE E, F, G   5.672+17.610+3.055=26.337
-
-# 2022preEE (genWeight in [-300,300])
-# WminusH 111744.57
-# WplusH  208646.60
-# ZH      111955.92
-# 2022postEE (genWeight in [-300,300])
-# WminusH 478370.10
-# WplusH  696955.24
-# ZH      399190.64
-
 lumi_dict = {
     # https://twiki.cern.ch/twiki/bin/viewauth/CMS/PdmVRun3Analysis
-    # 34.7486
-    "2022preEE" : 7.9804e3, # pb^-1
-    "2022postEE": 26.6717e3,# pb^-1
-    # 27.245
-    "2023preBPix": 17.794e3,
-    "2023postBPix": 9.451e3,
+    # https://twiki.cern.ch/twiki/bin/view/CMS/BrilcalcQuickStart
+    # Brilcalc # 63.145882859
+    # 34.748619391999995
+    "2022preEE" : 8.077009685e3, # pb^-1
+    "2022postEE": 26.671609707e3,# pb^-1 
+    # 28.397263467000002
+    "2023preBPix": 18.704133414e3, # B+C
+    "2023postBPix": 9.693130053e3,
 }
 
 # 2022
 fake_factor_dict = {
     "2022preEE": 
         {
-            "m2m": 0.02475,
-            "e2m": 0.02341,
+            "e2m": 0.022747415392360283,
+            "m2m": 0.024111873284901615,
         },
     "2022postEE": 
         {
-            "m2m": 0.02475,
-            "e2m": 0.02341,
+            "e2m": 0.022747415392360283,
+            "m2m": 0.024111873284901615,
         },
     "2023preBPix":
         {
-            "m2m": 0.02498,
-            "e2m": 0.02493,
+            "e2m": 0.024995812473941486,
+            "m2m": 0.024334559187637824,
         },
     "2023postBPix":
         {
-            "m2m": 0.02498,
-            "e2m": 0.02493,
+            "e2m": 0.024995812473941486,
+            "m2m": 0.024334559187637824,
         },    
 }
 
@@ -76,18 +68,22 @@ genWeight_dict = {
 
 col_dict = { 
     'Train_weight': '1.0',
+    'puweight': '1.0',
+    'puweight__PileUpDown': '1.0',
+    'puweight__PileUpUp' : '1.0',
+    'BosonDecayMode': '-10',
+    
     'btag_weight': '1.0f',
     'genWeight': '1.0f', 
     'Xsec' : '1.0f', 
     'genEventSumW': '1.0f', 
-    'puweight': '1.0', 
     'genmet_pt': '-10.f',
     'genmet_phi': '-10.f',
-    'BosonDecayMode': '-10',
+    
 }
 #
 process_name = [
-    'WplusH_Hto2Mu','WminusH_Hto2Mu','ZH_Hto2Mu', 'TTH_Hto2Mu', # vhmm
+    'WplusH_Hto2Mu','WminusH_Hto2Mu','ZH_Hto2Mu', 'TTH_Hto2Mu', "GluGluHto2Mu", "VBFHto2Mu", # vhmm
     'WZto3LNu','WZto2L2Q','WWto2L2Nu','ZZto2L2Q','ZZto2L2Nu','ZZto4L', # diboson
     'TTto2L2Nu','TWminusto2L2Nu','TbarWplusto2L2Nu', # top
     # dyjets and data only 1 process, no need to add flag
@@ -164,8 +160,6 @@ def Add_new_column(input_path, output_path, samples_list, new_column):
                         df_mc = df_mc.Define("wz_zz_scale","applyWZscale2022(is_diboson, is_WWto2L2Nu, nelectrons, nbaseelectrons, nmuons, nbasemuons)")
                     elif "2023" in year:
                         df_mc = df_mc.Define("wz_zz_scale","applyWZscale2023(is_diboson, is_WWto2L2Nu, nelectrons, nbaseelectrons, nmuons, nbasemuons)")
-                    elif "2018" in year:
-                        df_mc = df_mc.Define("wz_zz_scale","applyWZscale2018(is_diboson, is_WWto2L2Nu, nelectrons, nbaseelectrons, nmuons, nbasemuons)")
                 # commom sfs
                 df_mc = df_mc.Define("id_wgt_mu_1","1.0")
                 df_mc = df_mc.Define("iso_wgt_mu_1","1.0")
@@ -194,15 +188,6 @@ def Add_new_column(input_path, output_path, samples_list, new_column):
                 df_mc = df_mc.Define("id_wgt_mu_2_below15__MuonIDIsoDown","1.0")
                 df_mc = df_mc.Define("iso_wgt_mu_2_below15__MuonIDIsoDown","1.0")
 
-                # df_mc = df_mc.Define("id_wgt_mu_1__MuonIDISO_tagIso","1.0")
-                # df_mc = df_mc.Define("iso_wgt_mu_1__MuonIDISO_tagIso","1.0")
-                # df_mc = df_mc.Define("id_wgt_mu_1_below15__MuonIDISO_tagIso","1.0")
-                # df_mc = df_mc.Define("iso_wgt_mu_1_below15__MuonIDISO_tagIso","1.0")
-                # df_mc = df_mc.Define("id_wgt_mu_2__MuonIDISO_tagIso","1.0")
-                # df_mc = df_mc.Define("iso_wgt_mu_2__MuonIDISO_tagIso","1.0")
-                # df_mc = df_mc.Define("id_wgt_mu_2_below15__MuonIDISO_tagIso","1.0")
-                # df_mc = df_mc.Define("iso_wgt_mu_2_below15__MuonIDISO_tagIso","1.0")
-
                 # 3l, 4l
                 if "e2m" in f  or "m2m" in f or "eemm" in f or "mmmm" in f:
                     df_mc = df_mc.Define("id_wgt_mu_3","1.0")
@@ -223,16 +208,15 @@ def Add_new_column(input_path, output_path, samples_list, new_column):
                     df_mc = df_mc.Define("id_wgt_mu_3_below15__MuonIDIsoDown","1.0")
                     df_mc = df_mc.Define("iso_wgt_mu_3_below15__MuonIDIsoDown","1.0")
 
-                    # df_mc = df_mc.Define("id_wgt_mu_3__MuonIDISO_tagIso","1.0")
-                    # df_mc = df_mc.Define("iso_wgt_mu_3__MuonIDISO_tagIso","1.0")
-                    # df_mc = df_mc.Define("id_wgt_mu_3_below15__MuonIDISO_tagIso","1.0")
-                    # df_mc = df_mc.Define("iso_wgt_mu_3_below15__MuonIDISO_tagIso","1.0")
-
                     df_mc = df_mc.Define("id_wgt_ele_loose_1__EleIDUp","1.0")
                     df_mc = df_mc.Define("id_wgt_ele_wp90Iso_1__EleIDUp","1.0")
                     
                     df_mc = df_mc.Define("id_wgt_ele_loose_1__EleIDDown","1.0")
                     df_mc = df_mc.Define("id_wgt_ele_wp90Iso_1__EleIDDown","1.0")
+                    
+                    df_mc = df_mc.Define("reco_wgt_ele_1","1.0")
+                    df_mc = df_mc.Define("reco_wgt_ele_1__EleRecoDown","1.0")
+                    df_mc = df_mc.Define("reco_wgt_ele_1__EleRecoUp","1.0")
 
                 # 4l
                 if "eemm" in f or "mmmm" in f:
@@ -254,16 +238,15 @@ def Add_new_column(input_path, output_path, samples_list, new_column):
                     df_mc = df_mc.Define("id_wgt_mu_4_below15__MuonIDIsoDown","1.0")
                     df_mc = df_mc.Define("iso_wgt_mu_4_below15__MuonIDIsoDown","1.0")
 
-                    # df_mc = df_mc.Define("id_wgt_mu_4__MuonIDISO_tagIso","1.0")
-                    # df_mc = df_mc.Define("iso_wgt_mu_4__MuonIDISO_tagIso","1.0")
-                    # df_mc = df_mc.Define("id_wgt_mu_4_below15__MuonIDISO_tagIso","1.0")
-                    # df_mc = df_mc.Define("iso_wgt_mu_4_below15__MuonIDISO_tagIso","1.0")
-
                     df_mc = df_mc.Define("id_wgt_ele_loose_2__EleIDUp","1.0")
                     df_mc = df_mc.Define("id_wgt_ele_wp90Iso_2__EleIDUp","1.0")
 
                     df_mc = df_mc.Define("id_wgt_ele_loose_2__EleIDDown","1.0")
                     df_mc = df_mc.Define("id_wgt_ele_wp90Iso_2__EleIDDown","1.0")
+                    
+                    df_mc = df_mc.Define("reco_wgt_ele_2","1.0")
+                    df_mc = df_mc.Define("reco_wgt_ele_2__EleRecoDown","1.0")
+                    df_mc = df_mc.Define("reco_wgt_ele_2__EleRecoUp","1.0")
 
                 if "nnmm" in f:
                     # add gen mu 
@@ -299,9 +282,6 @@ def Add_new_column(input_path, output_path, samples_list, new_column):
                     df_mc = df_mc.Define("is_2023", "1.0f")
                 else:
                     df_mc = df_mc.Define("is_2023", "0.0f")
-                # create an empty flag for data in e2m region
-                # if 'e2m_dyfakeinge_regionc' in f:
-                #     df_mc = df_mc.Define('Flag_dimuon_Zmass_veto', str('1.0f'))
                 
                 col_names_v2 = df_mc.GetColumnNames()
                 output_list = []
@@ -324,7 +304,7 @@ def post_proc_varial(input_path, output_path, samples_list):
             continue
         # remove the sig in CR
         if "cr" in channel:
-            if "WplusH" in f or "WminusH" in f or "ZH" in f or "TTH" in f:
+            if "Hto2Mu" in f:
                 continue
         for n in samples_list:
             if n in f:
@@ -349,7 +329,7 @@ def post_proc_varial(input_path, output_path, samples_list):
                 if 'Xsec'  not in col_names:
                     # cut the abnormal region in 2022postEE
                     # please cut event that has the abnormal genWeight (currently only for vhmm signal?)
-                    if 'Hto2Mu' in f and 'TTH' not in f:
+                    if 'WplusH_Hto2Mu' in f or 'WminusH_Hto2Mu' in f or 'ZH_Hto2Mu' in f:
                         df_mc = df_mc.Filter('abs(genWeight)<3')
                         # need to change the genWeightSum of signal
                         gensumw = genWeight_dict[n]
@@ -364,8 +344,6 @@ def post_proc_varial(input_path, output_path, samples_list):
                     else:
                         df_mc = df_mc.Define('Xsec', str(samples_list[n]['xsec']) +'f').Define('genEventSumW', str(gensumw) + 'f')
                     # df_mc = df_mc.Define('Train_weight','Xsec* 139e3 * genWeight / genEventSumW') ## define weight calculated
-                    # e2m no cut: 0.03600716626152818
-                    # m2m no cut: 0.06964751219359668
                     lumi = lumi_dict[year]
                     if Updated_regionc:
                         if "e2m_dyfakeinge_regionc" in f:
@@ -393,10 +371,6 @@ def post_proc_varial(input_path, output_path, samples_list):
                                 df_mc = df_mc.Define("id_wgt_mu_3_below15__MuonIDIsoDown","1.0")
                                 df_mc = df_mc.Define("iso_wgt_mu_3_below15__MuonIDIsoDown","1.0")
 
-                                # df_mc = df_mc.Define("id_wgt_mu_3__MuonIDISO_tagIso","1.0")
-                                # df_mc = df_mc.Define("iso_wgt_mu_3__MuonIDISO_tagIso","1.0")
-                                # df_mc = df_mc.Define("id_wgt_mu_3_below15__MuonIDISO_tagIso","1.0")
-                                # df_mc = df_mc.Define("iso_wgt_mu_3_below15__MuonIDISO_tagIso","1.0")
                             elif "m2m" in f:
                                 df_mc = df_mc.Define("id_wgt_ele_loose_1","1.0")
                                 df_mc = df_mc.Define("id_wgt_ele_wp90Iso_1","1.0")
@@ -410,8 +384,6 @@ def post_proc_varial(input_path, output_path, samples_list):
                                 df_mc = df_mc.Define("wz_zz_scale","applyWZscale2022(is_diboson, is_WWto2L2Nu, nelectrons, nbaseelectrons, nmuons, nbasemuons)")
                             elif "2023" in year:
                                 df_mc = df_mc.Define("wz_zz_scale","applyWZscale2023(is_diboson, is_WWto2L2Nu, nelectrons, nbaseelectrons, nmuons, nbasemuons)")
-                        elif "2018" in year:
-                            df_mc = df_mc.Define("wz_zz_scale","applyWZscale2018(is_diboson, is_WWto2L2Nu, nelectrons, nbaseelectrons, nmuons, nbasemuons)")
                     if "eemm" in f:
                         df_mc = df_mc.Define("id_wgt_mu_3","1.0")
                         df_mc = df_mc.Define("iso_wgt_mu_3","1.0")
@@ -431,10 +403,6 @@ def post_proc_varial(input_path, output_path, samples_list):
                         df_mc = df_mc.Define("iso_wgt_mu_3__MuonIDIsoDown","1.0")
                         df_mc = df_mc.Define("id_wgt_mu_3_below15__MuonIDIsoDown","1.0")
                         df_mc = df_mc.Define("iso_wgt_mu_3_below15__MuonIDIsoDown","1.0")
-                        # df_mc = df_mc.Define("id_wgt_mu_3__MuonIDISO_tagIso","1.0")
-                        # df_mc = df_mc.Define("iso_wgt_mu_3__MuonIDISO_tagIso","1.0")
-                        # df_mc = df_mc.Define("id_wgt_mu_3_below15__MuonIDISO_tagIso","1.0")
-                        # df_mc = df_mc.Define("iso_wgt_mu_3_below15__MuonIDISO_tagIso","1.0")
 
                         df_mc = df_mc.Define("id_wgt_mu_4__MuonIDIsoUp","1.0")
                         df_mc = df_mc.Define("iso_wgt_mu_4__MuonIDIsoUp","1.0")
@@ -444,10 +412,6 @@ def post_proc_varial(input_path, output_path, samples_list):
                         df_mc = df_mc.Define("iso_wgt_mu_4__MuonIDIsoDown","1.0")
                         df_mc = df_mc.Define("id_wgt_mu_4_below15__MuonIDIsoDown","1.0")
                         df_mc = df_mc.Define("iso_wgt_mu_4_below15__MuonIDIsoDown","1.0")
-                        # df_mc = df_mc.Define("id_wgt_mu_4__MuonIDISO_tagIso","1.0")
-                        # df_mc = df_mc.Define("iso_wgt_mu_4__MuonIDISO_tagIso","1.0")
-                        # df_mc = df_mc.Define("id_wgt_mu_4_below15__MuonIDISO_tagIso","1.0")
-                        # df_mc = df_mc.Define("iso_wgt_mu_4_below15__MuonIDISO_tagIso","1.0")
 
                     elif "mmmm" in f:
                         df_mc = df_mc.Define("id_wgt_ele_loose_1","1.0")
