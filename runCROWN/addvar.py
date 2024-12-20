@@ -48,35 +48,24 @@ def post_proc_varial(input_path, output_path):
 
             df_mc = df_mc.Define("ptl1_ov_pt2mu", "extra_lep_pt / H_pt")
             df_mc = df_mc.Define("ptl1_ov_m2mu", "extra_lep_pt / H_mass")
-            df_mc = df_mc.Define("pz1_nu", "calculateNeutrinoPz(extra_lep_pt, extra_lep_eta, extra_lep_phi, met_pt, met_phi,0)")
-            df_mc = df_mc.Define("pz2_nu", "calculateNeutrinoPz(extra_lep_pt, extra_lep_eta, extra_lep_phi, met_pt, met_phi,1)")
+            df_mc = df_mc.Define("pz_nu", "calculateNeutrinoPz(extra_lep_pt, extra_lep_eta, extra_lep_phi, extra_lep_mass, met_pt, met_phi)")
             # W and Higgs mumu
             df_mc = df_mc.Define("W_H_dphi", "dphi(W_phi, H_phi)")
             df_mc = df_mc.Define("W_mu1_dphi", "dphi(W_phi, mu1_fromH_phi)")
             df_mc = df_mc.Define("W_mu2_dphi", "dphi(W_phi, mu2_fromH_phi)")
             df_mc = df_mc.Define("ptW_ov_pt2mu", "W_pt / H_pt")
-            df_mc = df_mc.Define("W_mass1","calc_Wmass(extra_lep_pt, extra_lep_eta, extra_lep_phi, met_pt, met_phi, pz1_nu)")
-            df_mc = df_mc.Define("W_mass2","calc_Wmass(extra_lep_pt, extra_lep_eta, extra_lep_phi, met_pt, met_phi, pz2_nu)")
-            df_mc = df_mc.Define("W_eta1","calc_Weta(extra_lep_pt, extra_lep_eta, extra_lep_phi, met_pt, met_phi, pz1_nu)")
-            df_mc = df_mc.Define("W_eta2","calc_Weta(extra_lep_pt, extra_lep_eta, extra_lep_phi, met_pt, met_phi, pz2_nu)")
-            # define lep muOS cosThetaStar
-            df_mc = df_mc.Define("lep_muOS_cosThStar_toW1H", "calc_CosThetaStar_toWH(W_pt, W_eta1, W_phi, W_mass1, H_pt, H_eta, H_phi, H_mass, extra_lep_pt, extra_lep_eta, extra_lep_phi, muOS_pt, muOS_eta, muOS_phi)" )
-            df_mc = df_mc.Define("lep_muOS_cosThStar_toW2H", "calc_CosThetaStar_toWH(W_pt, W_eta2, W_phi, W_mass2, H_pt, H_eta, H_phi, H_mass, extra_lep_pt, extra_lep_eta, extra_lep_phi, muOS_pt, muOS_eta, muOS_phi)" )
-            # define lep muSS cosThetaStar
-            df_mc = df_mc.Define("lep_muSS_cosThStar_toW1H", "calc_CosThetaStar_toWH(W_pt, W_eta1, W_phi, W_mass1, H_pt, H_eta, H_phi, H_mass, extra_lep_pt, extra_lep_eta, extra_lep_phi, muSS_pt, muSS_eta, muSS_phi)" )
-            df_mc = df_mc.Define("lep_muSS_cosThStar_toW2H", "calc_CosThetaStar_toWH(W_pt, W_eta2, W_phi, W_mass2, H_pt, H_eta, H_phi, H_mass, extra_lep_pt, extra_lep_eta, extra_lep_phi, muSS_pt, muSS_eta, muSS_phi)" )
-
-            # define lep muOS cosThetaStar
-            df_mc = df_mc.Define("lep_muOS_cosThStar_toW1toH", "calc_CosThetaStar_toWtoH(W_pt, W_eta1, W_phi, W_mass1, H_pt, H_eta, H_phi, H_mass, extra_lep_pt, extra_lep_eta, extra_lep_phi, muOS_pt, muOS_eta, muOS_phi)" )
-            df_mc = df_mc.Define("lep_muOS_cosThStar_toW2toH", "calc_CosThetaStar_toWtoH(W_pt, W_eta2, W_phi, W_mass2, H_pt, H_eta, H_phi, H_mass, extra_lep_pt, extra_lep_eta, extra_lep_phi, muOS_pt, muOS_eta, muOS_phi)" )
-            # define lep muSS cosThetaStar
-            df_mc = df_mc.Define("lep_muSS_cosThStar_toW1toH", "calc_CosThetaStar_toWtoH(W_pt, W_eta1, W_phi, W_mass1, H_pt, H_eta, H_phi, H_mass, extra_lep_pt, extra_lep_eta, extra_lep_phi, muSS_pt, muSS_eta, muSS_phi)" )
-            df_mc = df_mc.Define("lep_muSS_cosThStar_toW2toH", "calc_CosThetaStar_toWtoH(W_pt, W_eta2, W_phi, W_mass2, H_pt, H_eta, H_phi, H_mass, extra_lep_pt, extra_lep_eta, extra_lep_phi, muSS_pt, muSS_eta, muSS_phi)" )
+            df_mc = df_mc.Define("W_mass","calc_Wmass(extra_lep_pt, extra_lep_eta, extra_lep_phi, extra_lep_mass, met_pt, met_phi, pz_nu)")
+            df_mc = df_mc.Define("W_eta","calc_Weta(extra_lep_pt, extra_lep_eta, extra_lep_phi, extra_lep_mass, met_pt, met_phi, pz_nu)")
             
+            # v1, add lep_mass
+            df_mc = df_mc.Define("lep_muOS_cosThStar_WH_v1", "calc_CosThetaStar_WH_v1(extra_lep_pt, extra_lep_eta, extra_lep_phi, extra_lep_mass, muOS_pt, muOS_eta, muOS_phi, mu2_fromH_mass)" )
+            df_mc = df_mc.Define("lep_muSS_cosThStar_WH_v1", "calc_CosThetaStar_WH_v1(extra_lep_pt, extra_lep_eta, extra_lep_phi, extra_lep_mass, muSS_pt, muSS_eta, muSS_phi, mu2_fromH_mass)" )
             # v2, xunwu's method
-            df_mc = df_mc.Define("lep_muOS_cosThStar_WH_v2", "calc_CosThetaStar_WH_v2(extra_lep_pt, extra_lep_eta, extra_lep_phi, muOS_pt, muOS_eta, muOS_phi)" )
-            df_mc = df_mc.Define("lep_muSS_cosThStar_WH_v2", "calc_CosThetaStar_WH_v2(extra_lep_pt, extra_lep_eta, extra_lep_phi, muSS_pt, muSS_eta, muSS_phi)" )
+            df_mc = df_mc.Define("lep_muOS_cosThStar_WH_v2", "calc_CosThetaStar_WH_v2(extra_lep_pt, extra_lep_eta, extra_lep_phi, extra_lep_mass, muOS_pt, muOS_eta, muOS_phi, mu2_fromH_mass)" )
+            df_mc = df_mc.Define("lep_muSS_cosThStar_WH_v2", "calc_CosThetaStar_WH_v2(extra_lep_pt, extra_lep_eta, extra_lep_phi, extra_lep_mass, muSS_pt, muSS_eta, muSS_phi, mu2_fromH_mass)" )
             
+            # define kT and antikT
+            # df_mc = df_mc.Define("")
             # met and Higgs mumu
             df_mc = df_mc.Define("met_H_dphi", "dphi(met_phi, H_phi)")
             df_mc = df_mc.Define("met_mu1_dphi", "dphi(met_phi, mu1_fromH_phi)")

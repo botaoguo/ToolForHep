@@ -49,13 +49,13 @@ float calc_CosThetaStar_WH_v1(float lepton_pt, float lepton_eta, float lepton_ph
 
     TLorentzVector parent_vec = lepton_vec + mu_vec;
     
-    TVector3 parent_p = parent_vec.Vert();
+    TVector3 parent_p = parent_vec.Vect();
     TVector3 parent_boost = -(parent_vec.BoostVector());
 
     lepton_vec.Boost(parent_boost);
     mu_vec.Boost(parent_boost);
-    TVector3 p1 = lepton_vec.Vert();
-    TVector3 p2 = mu_vec.Vert();
+    TVector3 p1 = lepton_vec.Vect();
+    TVector3 p2 = mu_vec.Vect();
 
     float cosh_angle = cos(p1.Angle(parent_p));
     
@@ -66,13 +66,13 @@ float calc_CosThetaStar_WH_v1(float lepton_pt, float lepton_eta, float lepton_ph
     }
 }
 
-float calc_Weta(float lepton_pt, float lepton_eta, float lepton_phi, float met_pt, float met_phi, float nu_pz) {
+float calc_Weta(float lepton_pt, float lepton_eta, float lepton_phi, float lepton_mass, float met_pt, float met_phi, float nu_pz) {
     TLorentzVector lepton_p4;
     TLorentzVector nu_p4;
     
     TLorentzVector W_p4;
     
-    lepton_p4.SetPtEtaPhiM(lepton_pt, lepton_eta, lepton_phi, 0.0); // Assuming lepton is massless (m = 0)
+    lepton_p4.SetPtEtaPhiM(lepton_pt, lepton_eta, lepton_phi, lepton_mass); 
     float nu_px = met_pt * cos(met_phi);
     float nu_py = met_pt * sin(met_phi);
     float nu_e = sqrt(nu_px * nu_px + nu_py * nu_py + nu_pz * nu_pz);
@@ -82,13 +82,13 @@ float calc_Weta(float lepton_pt, float lepton_eta, float lepton_phi, float met_p
     return (float)W_p4.Eta();
 }
 
-float calc_Wmass(float lepton_pt, float lepton_eta, float lepton_phi, float met_pt, float met_phi, float nu_pz) {
+float calc_Wmass(float lepton_pt, float lepton_eta, float lepton_phi, float lepton_mass, float met_pt, float met_phi, float nu_pz) {
     TLorentzVector lepton_p4;
     TLorentzVector nu_p4;
     
     TLorentzVector W_p4;
     
-    lepton_p4.SetPtEtaPhiM(lepton_pt, lepton_eta, lepton_phi, 0.0); // Assuming lepton is massless (m = 0)
+    lepton_p4.SetPtEtaPhiM(lepton_pt, lepton_eta, lepton_phi, lepton_mass);
     float nu_px = met_pt * cos(met_phi);
     float nu_py = met_pt * sin(met_phi);
     float nu_e = sqrt(nu_px * nu_px + nu_py * nu_py + nu_pz * nu_pz);
@@ -99,11 +99,11 @@ float calc_Wmass(float lepton_pt, float lepton_eta, float lepton_phi, float met_
 }
 
 // Function to calculate neutrino pz solutions using TLorentzVector
-float calculateNeutrinoPz(float lepton_pt, float lepton_eta, float lepton_phi, float met_pt, float met_phi) {
+float calculateNeutrinoPz(float lepton_pt, float lepton_eta, float lepton_phi, float lepton_mass, float met_pt, float met_phi) {
     
     const float mW = 80.379; // W boson mass in GeV
     TLorentzVector lepton;
-    lepton.SetPtEtaPhiM(lepton_pt, lepton_eta, lepton_phi, 0.0); // Assuming lepton is massless (m = 0)
+    lepton.SetPtEtaPhiM(lepton_pt, lepton_eta, lepton_phi, lepton_mass);
     // MET (neutrino transverse momentum) components
     float nu_px = met_pt * cos(met_phi);
     float nu_py = met_pt * sin(met_phi);
@@ -170,6 +170,7 @@ float calculate_kT(float p1_pt, float p1_eta, float p1_phi, float p1_mass,
     if (p1_pt < 0 || p2_pt < 0) {
         return -10.0f;
     }
+    TLorentzVector p1_p4,p2_p4;
     p1_p4.SetPtEtaPhiM(p1_pt, p1_eta, p1_phi, p1_mass);
     p2_p4.SetPtEtaPhiM(p2_pt, p2_eta, p2_phi, p2_mass);
 
@@ -186,6 +187,7 @@ float calculate_antikT(float p1_pt, float p1_eta, float p1_phi, float p1_mass,
     if (p1_pt < 0 || p2_pt < 0) {
         return -10.0f;
     }
+    TLorentzVector p1_p4,p2_p4;
     p1_p4.SetPtEtaPhiM(p1_pt, p1_eta, p1_phi, p1_mass);
     p2_p4.SetPtEtaPhiM(p2_pt, p2_eta, p2_phi, p2_mass);
 
