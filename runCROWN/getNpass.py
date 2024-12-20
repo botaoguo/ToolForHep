@@ -32,6 +32,7 @@ def run_pass(channel, file_names, do_wzscale):
             apply_wz_scale = False
         elif do_wzscale is False:
             pre_selection = "(dimuonCR_mass>=85 && dimuonCR_mass<=95)&&trg_single_mu24==1&&mt_W<60"
+            # pre_selection = "(dimuonCR_mass>=85 && dimuonCR_mass<=95)&&trg_single_mu24==1"
             print("apply wz scale now")
             apply_wz_scale = True
     else:

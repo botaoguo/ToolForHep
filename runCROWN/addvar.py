@@ -70,7 +70,20 @@ def post_proc_varial(input_path, output_path):
             df_mc = df_mc.Define("met_H_dphi", "dphi(met_phi, H_phi)")
             df_mc = df_mc.Define("met_mu1_dphi", "dphi(met_phi, mu1_fromH_phi)")
             df_mc = df_mc.Define("met_mu2_dphi", "dphi(met_phi, mu2_fromH_phi)")
+        
+        if channel == "4l":
+            df_mc = df_mc.Define("ptZ_ov_massZ", "Z_pt / Z_mass")
+            df_mc = df_mc.Define("ptl1_ov_ptZ","lep1_fromZ_pt / Z_pt")
+            df_mc = df_mc.Define("ptl2_ov_ptZ","lep2_fromZ_pt / Z_pt")
+            df_mc = df_mc.Define("ptl1_ov_massZ","lep1_fromZ_pt / Z_mass")
+            df_mc = df_mc.Define("ptl2_ov_massZ","lep2_fromZ_pt / Z_mass")
             
+            df_mc = df_mc.Define("Z_H_cosThStar_v2", "calc_CosThetaStar_WH_v2(Z_pt, Z_eta, Z_phi, Z_mass, H_pt, H_eta, H_phi, H_mass)" )
+            df_mc = df_mc.Define("H_Z_cosThStar_v2", "calc_CosThetaStar_WH_v2(H_pt, H_eta, H_phi, H_mass, Z_pt, Z_eta, Z_phi, Z_mass)" )
+            
+            df_mc = df_mc.Define("lep1_lep2_cosThStar", "calc_CosThetaStar_WH_v2(lep1_fromZ_pt, lep1_fromZ_eta, lep1_fromZ_phi, lep1_fromZ_mass, lep2_fromZ_pt, lep2_fromZ_eta, lep2_fromZ_phi, lep2_fromZ_mass)" )
+            df_mc = df_mc.Define("mu1_mu2_cosThStar", "calc_CosThetaStar_WH_v2(mu1_fromH_pt, mu1_fromH_eta, mu1_fromH_phi, mu1_fromH_mass, mu2_fromH_pt, mu2_fromH_eta, mu2_fromH_phi, mu2_fromH_mass)" )
+
 
         df_mc.Snapshot('ntuple',  f.replace(input_path, output_path)) # update the file finished
 
@@ -87,8 +100,8 @@ if __name__ == '__main__':
     
     current_path = os.getcwd()
     if args.updated == False:
-        input_path = current_path + '/' + 'input'
-        output_path = current_path + '/' + 'output'
+        input_path = current_path + '/' + 'input_{}'.format(channel)
+        output_path = current_path + '/' + 'output_{}'.format(channel)
     elif args.updated == True:
         input_path = current_path + '/' + 'input_cr_c'
         output_path = current_path + '/' + 'output_cr_c'
