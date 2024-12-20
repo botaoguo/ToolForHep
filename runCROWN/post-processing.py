@@ -374,12 +374,15 @@ def post_proc_varial(input_path, output_path, samples_list):
                             elif "m2m" in f:
                                 df_mc = df_mc.Define("id_wgt_ele_loose_1","1.0")
                                 df_mc = df_mc.Define("id_wgt_ele_wp90Iso_1","1.0")
-                                
                                 df_mc = df_mc.Define("id_wgt_ele_loose_1__EleIDUp","1.0")
                                 df_mc = df_mc.Define("id_wgt_ele_wp90Iso_1__EleIDUp","1.0")
-
                                 df_mc = df_mc.Define("id_wgt_ele_loose_1__EleIDDown","1.0")
                                 df_mc = df_mc.Define("id_wgt_ele_wp90Iso_1__EleIDDown","1.0")
+
+                                df_mc = df_mc.Define("reco_wgt_ele_1","1.0")
+                                df_mc = df_mc.Define("reco_wgt_ele_1__EleRecoDown","1.0")
+                                df_mc = df_mc.Define("reco_wgt_ele_1__EleRecoUp","1.0")
+
                             if "2022" in year:
                                 df_mc = df_mc.Define("wz_zz_scale","applyWZscale2022(is_diboson, is_WWto2L2Nu, nelectrons, nbaseelectrons, nmuons, nbasemuons)")
                             elif "2023" in year:
@@ -427,6 +430,13 @@ def post_proc_varial(input_path, output_path, samples_list):
                         df_mc = df_mc.Define("id_wgt_ele_wp90Iso_2__EleIDUp","1.0")
                         df_mc = df_mc.Define("id_wgt_ele_loose_2__EleIDDown","1.0")
                         df_mc = df_mc.Define("id_wgt_ele_wp90Iso_2__EleIDDown","1.0")
+
+                        df_mc = df_mc.Define("reco_wgt_ele_1","1.0")
+                        df_mc = df_mc.Define("reco_wgt_ele_1__EleRecoDown","1.0")
+                        df_mc = df_mc.Define("reco_wgt_ele_1__EleRecoUp","1.0")
+                        df_mc = df_mc.Define("reco_wgt_ele_2","1.0")
+                        df_mc = df_mc.Define("reco_wgt_ele_2__EleRecoDown","1.0")
+                        df_mc = df_mc.Define("reco_wgt_ele_2__EleRecoUp","1.0")
 
                     # apply dy scale in fjmm
                     if "fjmm" in f and "2022" in year:
