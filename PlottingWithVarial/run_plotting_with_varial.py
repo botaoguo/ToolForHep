@@ -45,7 +45,7 @@ all_input_tokens_and_file_patterns = dict(
     for items in config.the_samples_dict.itervalues()
     for tok in items[-2]
 )
-#print(all_input_tokens_and_file_patterns)
+# print(all_input_tokens_and_file_patterns)
 
 filenames = dict(
     (
@@ -220,10 +220,10 @@ def mk_plotter_and_webcreator():
         name='Plots',
         pattern=config.name+'/HistosFromTree/*/*.root',
         hook_loaded_histos=input_hook,
-        plotter_factory=plotter_factory,    # use own factory # using with stack=False
+        # plotter_factory=plotter_factory,    # use own factory # using with stack=False
         combine_files=True,
-        stack=False
-        # stack=True,
+        # stack=False,
+        stack=True,
     )
     return [plotter, varial.tools.WebCreator()]
 
